@@ -18,15 +18,16 @@
     <input type="file" id="importFile" accept=".json" onchange="importBookmarks(event)">
   </div>
   <h1>taggle</h1>
-  
+    <input type="text" id="urlInput" placeholder="Enter URL">
+  <input type="text" id="tagInput" placeholder="Enter subtags (comma-separated)">
+  <button onclick="saveBookmark()">taggle it</button>
+    <!-- Export and Import buttons -->
+    <button onclick="exportBookmarks()">Export taggles</button>
+    <input type="file" id="importFile" accept=".json" onchange="importBookmarks(event)">
   <!-- Navigation bar for subreddits (tags) -->
   <ul id="subredditLinks">
     <!-- Subreddit links will be dynamically generated here -->
   </ul>
-  
-  <input type="text" id="urlInput" placeholder="Enter URL">
-  <input type="text" id="tagInput" placeholder="Enter subtags (comma-separated)">
-  <button onclick="saveBookmark()">taggle it</button>
   
   <!-- Export and Import functionality -->
   <hr>
