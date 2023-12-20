@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" sizes="526x526" href="logo.png">
+  <link rel="icon" href="logo.png" type="image/x-icon">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <title>taggle</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <script>alert('Make sure to backup your taggles');</script>
+  <div class="top-right-buttons">
+    <!-- Export and Import buttons -->
+    <button onclick="exportBookmarks()">Export taggles</button>
+    <input type="file" id="importFile" accept=".json" onchange="importBookmarks(event)">
+  </div>
+  <h1>taggle</h1>
+  
+  <!-- Navigation bar for subreddits (tags) -->
+  <ul id="subredditLinks">
+    <!-- Subreddit links will be dynamically generated here -->
+  </ul>
+  
+  <input type="text" id="urlInput" placeholder="Enter URL">
+  <input type="text" id="tagInput" placeholder="Enter subtags (comma-separated)">
+  <button onclick="saveBookmark()">taggle it</button>
+  
+  <!-- Export and Import functionality -->
+  <hr>
+  
+  <div id="bookmarksList">
+    <!-- Display bookmarks here -->
+  </div>
+
+  <script>
+    // Function to save bookmarks to local storage
+    function saveBookmark() {
+      const urlInput = document.getElementById('urlInput').value;
+      const tagInput = document.getElementById('tagInput').value.split(',').map(tag => tag.trim());
+      
+      if (urlInput === '' || tagInput.length === 0) {
+        alert('Please enter a URL and at least one subtag.');
+        return;
+      }
+
+      let bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+
+      const newBookmark = {
+        url: urlInput,
+        tags: tagInput
+      };
+
+      bookmarks.push(newBookmark);
+      localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+
+      displayBookmarks('All');
+      displaySubreddits();
+    }
+
+    // Function to display bookmarks based on tag/category
+    // Function to save bookmarks to local storage
+    function saveBookmark() {
+      const urlInput = document.getElementById('urlInput').value;
+      const tagInput = document.getElementById('tagInput').value.split(',').map(tag => tag.trim());
+
+      if (urlInput === '' || tagInput.length === 0) {
+        alert('Please enter a URL and at least one subtag.');
+        return;
+      }
+
+      let bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+
+      const newBookmark = {
+        url: urlInput,
+        tags: tagInput
+      };
+
+      bookmarks.push(newBookmark);
+      localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+
+      displayBookmarks('All');
+      displaySubreddits();
+    }
+
+    // Function to display bookmarks based on tag/category
+    function displayBookmarks(category) {
+      const bookmarksList = document.getElementById('bookmarksList');
+      bookmarksList.innerHTML = '';
+
+      let bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+
+      if (category === 'All') {
+        // Display all bookmarks
+        bookmarks.forEach((bookmark, index) => {
+          createBookmarkElement(bookmark, index);
+        });
+      } else {
+        // Display bookmarks based on category/tag
+        bookmarks.forEach((bookmark, index) => {
+          if (bookmark.tags.includes(category)) {
+            createBookmarkElement(bookmark, index);
+          }
+        });
+      }
+    }
+
+    // Function to create bookmark element
+    function createBookmarkElement(bookmark, index) {
+      const bookmarksList = document.getElementById('bookmarksList');
+      const bookmarkItem = document.createElement('div');
+      bookmarkItem.innerHTML = `
+        <p><strong></strong> <a href="${bookmark.url}" target="_blank">${bookmark.url}</a></p>
+        <button onclick="shareBookmark(${index})">Share</button>
+        <button onclick="deleteBookmark(${index})">Delete</button>
+        <hr>
+      `;
+      bookmarksList.appendChild(bookmarkItem);
+    }
+
+    // Function to delete a bookmark
+    function deleteBookmark(index) {
+      let bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+
+      if (index > -1) {
+        bookmarks.splice(index, 1);
+      }
+
+      localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+      displayBookmarks('All');
+      displaySubreddits();
+    }
+
+    // Function to display unique tags as subreddit links
+    function displaySubreddits() {
+      const navBar = document.getElementById('subredditLinks');
+      navBar.innerHTML = '';
+
+      let bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+      let allTags = [];
+
+      // Extract all tags from bookmarks
+      bookmarks.forEach(bookmark => {
+        allTags = allTags.concat(bookmark.tags);
+      });
+
+      // Get unique tags
+      const uniqueTags = [...new Set(allTags)];
+
+      // Display tags as subreddit links
+      uniqueTags.forEach(tag => {
+        const listItem = document.createElement('li');
+        const link = document.createElement('a');
+        link.textContent = tag;
+        link.href = '#';
+        link.onclick = function () {
+          displayBookmarks(tag);
+        };
+        listItem.appendChild(link);
+        navBar.appendChild(listItem);
+      });
+    }
+    // Function to share a bookmark
+    function shareBookmark(index) {
+      let bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+
+      if (index > -1 && index < bookmarks.length) {
+        const bookmarkToShare = bookmarks[index];
+
+        if (navigator.share) {
+          navigator.share({
+            title: 'Check out this site from my taggles!',
+            text: `taggle URL: ${bookmarkToShare.url}`,
+            url: 'https://hashcomp.github.io/taggle/'
+          })
+            .then(() => {
+              console.log('Bookmark shared successfully.');
+            })
+            .catch((error) => {
+              console.error('Error sharing bookmark:', error);
+            });
+        } else {
+          // Fallback for browsers that do not support Web Share API
+          alert('This feature is not supported in this browser 😭');
+          // You can implement a different sharing mechanism or display a message for unsupported browsers
+        }
+      }
+    }
+
+    function exportBookmarks() {
+      let bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+
+      if (bookmarks.length === 0) {
+        alert('No bookmarks to export.');
+        return;
+      }
+
+      const data = JSON.stringify(bookmarks);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'bookmarks.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Function to import bookmarks from a JSON file
+    function importBookmarks(event) {
+      const file = event.target.files[0];
+
+      if (!file) {
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const importedBookmarks = JSON.parse(e.target.result);
+          localStorage.setItem('bookmarks', JSON.stringify(importedBookmarks));
+          displayBookmarks('All');
+          displaySubreddits();
+          alert('Taggles imported successfully.');
+        } catch (error) {
+          alert('Invalid file or data format. Please select a valid JSON file.');
+        }
+      };
+
+      reader.readAsText(file);
+    }
+
+    // Display bookmarks and subreddit links on page load
+    displayBookmarks('All');
+    displaySubreddits();
+  </script>
+</body>
+</html>
