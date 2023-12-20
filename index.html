@@ -105,16 +105,17 @@
 
     // Function to create bookmark element
     function createBookmarkElement(bookmark, index) {
-      const bookmarksList = document.getElementById('bookmarksList');
-      const bookmarkItem = document.createElement('div');
-      bookmarkItem.innerHTML = `
-        <p><strong></strong> <a href="${bookmark.url}" target="_blank">${bookmark.url}</a></p>
-        <button onclick="shareBookmark(${index})">Share</button>
-        <button onclick="deleteBookmark(${index})">Delete</button>
-        <hr>
-      `;
-      bookmarksList.appendChild(bookmarkItem);
-    }
+  const bookmarksList = document.getElementById('bookmarksList');
+  const bookmarkItem = document.createElement('div');
+  bookmarkItem.innerHTML = `
+    <p><strong></strong> <a href="${bookmark.url}" target="_blank" class="bookmark-url">${bookmark.url}</a></p>
+    <button onclick="shareBookmark(${index})">Share</button>
+    <button onclick="deleteBookmark(${index})">Delete</button>
+    <hr>
+  `;
+  bookmarksList.appendChild(bookmarkItem);
+}
+
 
     // Function to delete a bookmark
     function deleteBookmark(index) {
