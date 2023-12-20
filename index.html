@@ -190,7 +190,7 @@
       let bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
 
       if (bookmarks.length === 0) {
-        alert('No bookmarks to export.');
+        alert('No taggles to export.');
         return;
       }
 
@@ -200,7 +200,7 @@
 
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'bookmarks.json';
+      a.download = 'mytaggles.json';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
